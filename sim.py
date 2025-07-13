@@ -1,11 +1,14 @@
 import pygame
 import pymunk
+import random
+import math
+import csv
 
-WIDTH,HEIGHT = 600,600
+WIDTH,HEIGHT = 600,400
 pygame.init()
 screen = pygame.display.set_mode((WIDTH,HEIGHT))
 space = pymunk.space.Space()
-space.gravity=(0,-981)
+space.gravity=(0,-601)
 FPS = 90
 clock = pygame.time.Clock()
 
@@ -30,8 +33,8 @@ class Car:
 
 class Pendulum:
     def __init__(self,length,car):
-        self.body = pymunk.Body(mass=5,moment=3000)
-        self.body.position = car.body.position +pymunk.Vec2d(0,5)
+        self.body = pymunk.Body(mass=5,moment=2750)
+        self.body.position = car.body.position +pymunk.Vec2d(random.uniform(-1,1),5)
         self.shape = pymunk.Segment(self.body, (0, 0), (0, length), 2)
         self.shape.filter = pymunk.ShapeFilter(group=1, categories=0b100, mask=0b0)
         self.pivot = pymunk.PivotJoint(car.body,self.body,car.body.position)
@@ -40,9 +43,7 @@ class Pendulum:
     def draw(self):
         verts = [self.body.local_to_world(self.shape.a),self.body.local_to_world(self.shape.b) ]
         verts = list(map(conv_coords, verts))
-        print(verts)
         pygame.draw.line(screen,'#000000',verts[0],verts[1],width=3)
-
 
 
 floor = pymunk.Segment(space.static_body, (0, 0), (WIDTH, 0), 0)
@@ -53,23 +54,59 @@ space.add(floor)
 space.add(wall1)
 space.add(wall2)
 
-c = Car(WIDTH/2,100,100,100)
+c = Car(WIDTH/2,50,100,50)
 p = Pendulum(200,c)
+
+def phi(state):
+    x,dx,t,dt = state
+    return [x,dx,t,dt,dx**2,dt**2]
+
+def serialize(arr):
+    arr = map(str,arr)
+    arr = ','.join(arr)
+    return '['+arr+']'
+
+
+samples = []
+
+state = None
 
 running = True
 while running:
+    if state is not None:
+        samples.append([serialize(prev_state),serialize(action),serialize(state),reward])
+    action = [0, 0]
+    state = phi([c.body.position[0], c.body.velocity[0], p.body.angle, p.body.angular_velocity])
+    reward = 1
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
             running = False
     keys = pygame.key.get_pressed()
     if keys[pygame.K_LEFT]:
         c.body.velocity += pymunk.Vec2d(-10,0)
+        action[0]=1
     if keys[pygame.K_RIGHT]:
         c.body.velocity += pymunk.Vec2d(10,0)
+        action[1]=1
 
     screen.fill("#60B0FF")
     space.step(1/FPS)
+    if not -math.pi/18<state[2]<math.pi/18:
+        reward = 0
+
+    if not -math.pi/2<state[2]<math.pi/2:
+        running=False
     clock.tick(FPS)
     c.draw()
     p.draw()
+    print(state)
+
+    prev_state = state
+
     pygame.display.flip()
+
+# print(len(samples))
+# with open("samples.csv","a",newline='') as f:
+#     writer = csv.writer(f)
+#     writer.writerows(samples)
+#
