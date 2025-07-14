@@ -4,14 +4,30 @@ import random
 import math
 import csv
 
+
 WIDTH,HEIGHT = 600,400
 FPS = 30
 GRAVITY = (0,-500)
 MAGNITUDE = 20
 
 def phi(state):
-    x,dx,t,dt = state
-    return [x,dx,t,dt,dx**2,dt**2]
+    x,dx,theta,dtheta = state
+
+    x -= WIDTH/2
+    return [
+        1.0,
+        x,
+        dx,
+        theta,
+        math.sin(theta),
+        math.cos(theta),
+        dtheta,
+        dx * dtheta,
+        x * dx,
+        dtheta ** 2,
+        dx ** 2,
+        x ** 2
+    ]
 
 def conv_coords(a):
     x,y = a
@@ -58,10 +74,6 @@ if __name__=="__main__":
     space.gravity=GRAVITY
 
     clock = pygame.time.Clock()
-
-
-
-
 
 
     floor = pymunk.Segment(space.static_body, (0, 0), (WIDTH, 0), 0)

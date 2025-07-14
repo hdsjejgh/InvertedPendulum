@@ -18,7 +18,6 @@ clock = pygame.time.Clock()
 A = np.load("A.npy")
 B = np.load("B.npy")
 theta = np.load("Theta.npy")
-print(theta)
 
 print(theta)
 scalar_s = joblib.load("scaler_s")
@@ -41,6 +40,8 @@ p = Pendulum(200,c,space)
 running = True
 while running:
     state = np.array(phi([c.body.position[0], c.body.velocity[0], p.body.angle, p.body.angular_velocity]))
+    x = state[1]
+    angle = state[3]
     state = np.reshape(scalar_s.transform(np.reshape(state,(1,-1))),(-1))
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
@@ -51,7 +52,7 @@ while running:
         s_prime = A@state + B*a
         values.append(theta.T @ s_prime)
     best = ACTIONS[values.index(max(values))]
-    print(best)
+    print(f"x={x:.2f}, Q={values}, chosen={best}")
     if best==-1:
         c.body.velocity += pymunk.Vec2d(-MAGNITUDE, 0)
     if best==1:
@@ -60,7 +61,7 @@ while running:
     screen.fill("#60B0FF")
     space.step(1/FPS)
 
-    if not -math.pi/2<state[2]<math.pi/2:
+    if not -math.pi/2<angle<math.pi/2:
         running=False
     clock.tick(FPS)
     c.draw(screen)
