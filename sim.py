@@ -8,9 +8,9 @@ import csv
 WIDTH,HEIGHT = 600,400
 FPS = 30
 GRAVITY = (0,-500)
-MAGNITUDE = 20
+MAGNITUDE = 20 #Magnitude of movement
 
-def phi(state):
+def phi(state): #feature map
     x,dx,theta,dtheta = state
 
     x -= WIDTH/2
@@ -29,7 +29,7 @@ def phi(state):
         x ** 2
     ]
 
-def conv_coords(a):
+def conv_coords(a): #converts pymunk coordinates to pygame coordinates
     x,y = a
     return x,HEIGHT-y
 
@@ -37,9 +37,9 @@ def conv_coords(a):
 class Car:
     def __init__(self,x,y,w,h,space):
         self.h = h
-        self.body = pymunk.Body(mass=30,moment=9999999)
+        self.body = pymunk.Body(mass=30,moment=9999999) #high moment to prevent rotation
         self.body.position = (x,y)
-        self.shape = pymunk.Poly(self.body, [(-w / 2, 0), (w / 2, 0), (w / 2, -h), (-w / 2, -h)])
+        self.shape = pymunk.Poly(self.body, [(-w / 2, 0), (w / 2, 0), (w / 2, -h), (-w / 2, -h)]) #The center of the body is at the top center of the box
         self.shape.filter = pymunk.ShapeFilter(group=1, categories=0b1, mask=0b10)
         self.shape.density=1
         space.add(self.body,self.shape)
@@ -52,7 +52,7 @@ class Car:
 class Pendulum:
     def __init__(self,length,car,space):
         self.body = pymunk.Body(mass=5,moment=3000)
-        self.body.position = car.body.position +pymunk.Vec2d(random.uniform(-1,1),5)
+        self.body.position = car.body.position +pymunk.Vec2d(random.uniform(-1,1),5) #pendulum starts slightly above the car so it rotates
         self.shape = pymunk.Segment(self.body, (0, 0), (0, length), 2)
         self.shape.filter = pymunk.ShapeFilter(group=1, categories=0b100, mask=0b0)
         self.pivot = pymunk.PivotJoint(car.body,self.body,car.body.position)
@@ -70,7 +70,7 @@ if __name__=="__main__":
     pygame.init()
     screen = pygame.display.set_mode((WIDTH,HEIGHT))
     space = pymunk.space.Space()
-    space = pymunk.space.Space()
+
     space.gravity=GRAVITY
 
     clock = pygame.time.Clock()
@@ -89,7 +89,7 @@ if __name__=="__main__":
 
 
 
-    def serialize(arr):
+    def serialize(arr): #converts lists to string reperesentation to store in csv
         arr = map(str,arr)
         arr = ','.join(arr)
         return '['+arr+']'
@@ -120,7 +120,7 @@ if __name__=="__main__":
         space.step(1/FPS)
 
 
-        if not -math.pi/2<state[2]<math.pi/2:
+        if not -math.pi/2<state[2]<math.pi/2: #Ends simulator is pendulum falls below the top half of rotation
             running=False
         clock.tick(FPS)
         c.draw(screen)
@@ -130,7 +130,7 @@ if __name__=="__main__":
         pygame.display.flip()
 
     print(len(samples))
-    with open("samples.csv","a",newline='') as f:
+    with open("samples.csv","a",newline='') as f: #writes all collected frames to samples.csv
         writer = csv.writer(f)
         writer.writerows(samples)
 
