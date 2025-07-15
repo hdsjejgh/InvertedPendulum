@@ -2,9 +2,8 @@ import joblib
 import numpy as np
 import pygame
 import pymunk
-import random
 import math
-from sim import phi,conv_coords,FPS,WIDTH,HEIGHT,Pendulum,Car,MAGNITUDE,GRAVITY
+from sim import phi,FPS,WIDTH,HEIGHT,Pendulum,Car,MAGNITUDE,GRAVITY
 from FVI import ACTIONS,NUM_FEATURES
 
 
@@ -43,6 +42,8 @@ while running:
     angle = state[3]
     #scales the state vector using same scaler in FVI.py
     state = np.reshape(scalar_s.transform(np.reshape(state,(1,-1))),(-1))
+    #state = np.reshape(np.reshape(state, (1, -1)), (-1))
+
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
             running = False

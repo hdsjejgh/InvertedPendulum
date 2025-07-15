@@ -5,10 +5,10 @@ import math
 import csv
 
 
-WIDTH,HEIGHT = 600,400
+WIDTH,HEIGHT = 800,400
 FPS = 30
-GRAVITY = (0,-500)
-MAGNITUDE = 20 #Magnitude of movement
+GRAVITY = (0,-300)
+MAGNITUDE = 10 #Magnitude of movement
 
 def phi(state): #feature map
     x,dx,theta,dtheta = state
@@ -37,7 +37,7 @@ def conv_coords(a): #converts pymunk coordinates to pygame coordinates
 class Car:
     def __init__(self,x,y,w,h,space):
         self.h = h
-        self.body = pymunk.Body(mass=30,moment=9999999) #high moment to prevent rotation
+        self.body = pymunk.Body(mass=300,moment=9999999) #high moment to prevent rotation
         self.body.position = (x,y)
         self.shape = pymunk.Poly(self.body, [(-w / 2, 0), (w / 2, 0), (w / 2, -h), (-w / 2, -h)]) #The center of the body is at the top center of the box
         self.shape.filter = pymunk.ShapeFilter(group=1, categories=0b1, mask=0b10)
@@ -51,7 +51,7 @@ class Car:
 
 class Pendulum:
     def __init__(self,length,car,space):
-        self.body = pymunk.Body(mass=5,moment=3000)
+        self.body = pymunk.Body(mass=5,moment=2000)
         self.body.position = car.body.position +pymunk.Vec2d(random.uniform(-1,1),5) #pendulum starts slightly above the car so it rotates
         self.shape = pymunk.Segment(self.body, (0, 0), (0, length), 2)
         self.shape.filter = pymunk.ShapeFilter(group=1, categories=0b100, mask=0b0)
@@ -133,6 +133,6 @@ if __name__=="__main__":
         pygame.display.flip()
 
     print(len(samples))
-    # with open("samples.csv","a",newline='') as f: #writes all collected frames to samples.csv
-    #     writer = csv.writer(f)
-    #     writer.writerows(samples)
+    with open("samples.csv","a",newline='') as f: #writes all collected frames to samples.csv
+        writer = csv.writer(f)
+        writer.writerows(samples)

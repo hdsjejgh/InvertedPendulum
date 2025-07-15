@@ -17,7 +17,7 @@ theta = np.zeros(shape=(NUM_FEATURES,1)) #theta is used to predict value given f
 SAMPLE_SIZE = 400 #samples per iteration
 ACTIONS_SAMPLES_SIZE = 25 #number of actions to sample to get predicted next
 EPOCHS = 100
-DISCOUNT = 0.99
+DISCOUNT = 0.95
 ACTIONS = [-1,0,1] #left, stay, right
 
 if __name__=="__main__":
@@ -59,7 +59,7 @@ if __name__=="__main__":
     covariance = np.cov(As + Ba ,np.array(s_i1).T)[:NUM_FEATURES,NUM_FEATURES:] #Calculates covariance between predictions and actual next states. used to get more accurate noise
 
     def reward(ind):
-        return 100 if -math.pi/18<og_s_i[ind][3]<math.pi/18 else 0 #reward is 100 if pendulum is within 20 degrees of upright
+        return 1 if abs(og_s_i[ind][3])<math.pi/36 else 0 #reward is 100 if pendulum is within 20 degrees of upright
 
     def next_state(state,action):
         state = np.array(state).reshape((NUM_FEATURES,1))
