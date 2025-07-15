@@ -74,4 +74,3 @@ while running:
     c.draw(screen)
     p.draw(screen)
     pygame.display.flip()
-

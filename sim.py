@@ -98,12 +98,15 @@ if __name__=="__main__":
     samples = []
 
 
+    prev = None
 
     running = True
     while running:
-
-        action = 0
         state = [c.body.position[0], c.body.velocity[0], p.body.angle, p.body.angular_velocity]
+        if prev is not None:
+            samples.append([serialize(prev),action,serialize(state)])
+        action = 0
+
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 running = False
@@ -115,7 +118,7 @@ if __name__=="__main__":
             c.body.velocity += pymunk.Vec2d(MAGNITUDE,0)
             action+=1
 
-        samples.append([serialize(state),action])
+        prev = state
         screen.fill("#60B0FF")
         space.step(1/FPS)
 
@@ -130,7 +133,6 @@ if __name__=="__main__":
         pygame.display.flip()
 
     print(len(samples))
-    with open("samples.csv","a",newline='') as f: #writes all collected frames to samples.csv
-        writer = csv.writer(f)
-        writer.writerows(samples)
-
+    # with open("samples.csv","a",newline='') as f: #writes all collected frames to samples.csv
+    #     writer = csv.writer(f)
+    #     writer.writerows(samples)

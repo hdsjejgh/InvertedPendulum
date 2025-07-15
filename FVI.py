@@ -8,6 +8,7 @@ import joblib
 from sim import phi
 
 s_i = []
+s_i1 = []
 a_i = []
 
 NUM_FEATURES = 12
@@ -16,7 +17,7 @@ theta = np.zeros(shape=(NUM_FEATURES,1)) #theta is used to predict value given f
 SAMPLE_SIZE = 400 #samples per iteration
 ACTIONS_SAMPLES_SIZE = 25 #number of actions to sample to get predicted next
 EPOCHS = 100
-DISCOUNT = 0.975
+DISCOUNT = 0.99
 ACTIONS = [-1,0,1] #left, stay, right
 
 if __name__=="__main__":
@@ -27,14 +28,14 @@ if __name__=="__main__":
         for line in reader:
             s_i.append(phi(json.loads(line[0])))
             a_i.append([int(line[1])])
+            s_i1.append(phi(json.loads(line[2])))
 
-    s_i1 = s_i[1:] #s_{i+1}. s_i[j] =s_i1[j-1]
-    s_i = s_i[:-1] #states
-    a_i = a_i[:-1] #actions for each s_i
+
 
     import collections
 
     print(collections.Counter(a[0] for a in a_i))
+
     scaler_s = StandardScaler()
     og_s_i = s_i #original states before being scaled
 
